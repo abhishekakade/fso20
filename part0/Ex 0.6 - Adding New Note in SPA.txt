@@ -1,0 +1,40 @@
+https://www.websequencediagrams.com/ 
+
+title Adding New Note in SPA
+
+Browser->Server: HTTP GET HTML, CSS, JS, JSON
+
+Server-->Browser: Response: HTML, CSS, JS, JSON
+
+note over Browser: 
+Notes are rendered 
+and displayed in SPA
+end note
+
+note over Browser: 
+User adds a new note...
+end note
+
+Browser->Server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+
+note over Server: 
+Note content text and date 
+(request payload) are saved 
+on server database
+end note
+
+note over Server: 
+Status code: 201 (request 
+has been fulfilled and has 
+resulted in one or more new 
+resources being created).
+end note
+
+Server-->Browser: new_note_spa (JSON with last added note/s)
+
+note over Browser: 
+Newly added note/s are 
+received as JSON and 
+pushed to the DOM to be 
+rendered without reloading.
+end note
