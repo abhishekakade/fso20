@@ -1,0 +1,17 @@
+body {
+  font-family: monospace;
+  font-size: 1.25rem;
+  margin: 3rem;
+  text-align: left;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+ul {
+  list-style-type: circle;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
