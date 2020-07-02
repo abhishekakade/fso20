@@ -1,0 +1,41 @@
+* {
+  box-sizing: border-box;
+}
+
+.App {
+  text-align: center;
+}
+
+#contacts-list {
+  padding-left: 1.25rem;
+  list-style-type: disc;
+  margin: auto;
+}
+
+input {
+  display: block;
+  margin: 1rem auto;
+  padding: 0.5rem;
+  width: 30ch;
+  font-size: 0.8rem;
+}
+
+#add-contact {
+  padding: 0.25rem;
+  width: 5rem;
+  font-weight: bold;
+}
+
+ul {
+  width: max-content;
+}
+
+ul li {
+  padding: 0.5rem;
+  text-align: left;
+}
+
+ul li:nth-of-type(odd) {
+  background-color: #dfdfdf;
+  list-style-type: circle;
+}
