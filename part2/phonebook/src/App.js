@@ -1,16 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Search from "./Search";
 import AddContactForm from "./AddContactForm";
 import ContactList from "./ContactList";
+import axios from "axios";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456" },
-    { name: "Ada Lovelace", number: "39-44-5323523" },
-    { name: "Dan Abramov", number: "12-43-234345" },
-    { name: "Mary Poppendieck", number: "39-23-6423122" },
-  ]);
+  const [persons, setPersons] = useState([]);
+
+  useEffect(() => {
+    // to prevent state update on unmounted component
+    let isComponentMounted = true;
+
+    console.log("useEffect");
+    axios.get("http://localhost:3001/persons").then((response) => {
+      console.log("Promise fulfilled", response.data);
+      if (isComponentMounted) setPersons(response.data);
+    });
+
+    return () => (isComponentMounted = false);
+  }, []);
+
+  // commented out hard coded contacts after adding axios fetched contacts
+  // const [persons, setPersons] = useState([
+  //   { name: "Arto Hellas", number: "040-123456" },
+  //   { name: "Ada Lovelace", number: "39-44-5323523" },
+  //   { name: "Dan Abramov", number: "12-43-234345" },
+  //   { name: "Mary Poppendieck", number: "39-23-6423122" },
+  // ]);
+
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchText, setSearchText] = useState("");
@@ -34,6 +52,7 @@ const App = () => {
     const newContactObj = {
       name: newName.trim(),
       number: newNumber.trim(),
+      id: persons.length + 1,
     };
     for (let person of persons) {
       if (

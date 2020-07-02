@@ -12,7 +12,7 @@ const ContactList = ({ searchText, persons }) => {
           : null
       )
       .map((person) => (
-        <li key={person.name}>
+        <li key={person.id}>
           {person.name}: {person.number}
         </li>
       ));
