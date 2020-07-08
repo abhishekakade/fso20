@@ -1,0 +1,65 @@
+* {
+  box-sizing: border-box;
+}
+
+.App {
+  text-align: center;
+}
+
+input {
+  display: block;
+  margin: 1rem auto;
+  padding: 0.5rem;
+  width: 30ch;
+  font-size: 0.8rem;
+}
+
+ul {
+  width: max-content;
+  display: block;
+  margin: auto;
+  padding: 0;
+  list-style-type: none;
+}
+
+ul li {
+  padding: 0.5rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+ul li:nth-of-type(odd) {
+  background-color: #dfdfdf;
+}
+
+ul#languages-list li {
+  font-weight: 400;
+  padding: 0.125rem;
+}
+
+ul#languages-list li:nth-of-type(odd) {
+  background-color: white;
+}
+
+#country-details p {
+  margin: 0.25rem auto;
+}
+
+#country-flag {
+  padding: 0;
+  border: 2px solid #121212;
+  border-radius: 5px;
+}
+
+#show-details-btn {
+  padding: 0.25rem 0.5rem;
+  margin-left: 0.5rem;
+}
+
+#weather-icon {
+  padding: 0;
+  border: 2px solid #121212;
+  border-radius: 5px;
+  height: 68px;
+  width: 68px;
+}
