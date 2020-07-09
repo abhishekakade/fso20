@@ -2,23 +2,36 @@ import axios from "axios";
 
 const baseURL = "http://localhost:3001/persons";
 
-const getAllContacts = () => axios.get(baseURL);
-
-const addContact = (newContact) => {
-  return axios.post(baseURL, newContact);
+const getAllContacts = async () => {
+  const request = axios.get(baseURL);
+  const response = await request;
+  return response.data;
 };
 
-const updateContact = (id, updatedContactObj) => {
-  return axios.patch(`${baseURL}/${id}`, updatedContactObj);
+const addContact = async (newContact) => {
+  const request = axios.post(baseURL, newContact);
+  const response = await request;
+  return response.data;
 };
 
-const replaceContact = (id, replaceContactObj) => {
-  return axios.put(`${baseURL}/${id}`, replaceContactObj);
+const updateContact = async (id, updatedContactObj) => {
+  const request = axios.patch(`${baseURL}/${id}`, updatedContactObj);
+  const response = await request;
+  return response.data;
 };
 
-const deleteContact = (id) => {
-  alert(`Deleted ${id}!`);
-  if (id) return axios.delete(`${baseURL}/${id}`);
+const replaceContact = async (id, replaceContactObj) => {
+  const request = axios.put(`${baseURL}/${id}`, replaceContactObj);
+  const response = await request;
+  return response.data;
+};
+
+const deleteContact = async (id) => {
+  if (id) {
+    const request = axios.delete(`${baseURL}/${id}`);
+    const response = await request;
+    return response.data;
+  }
 };
 
 export default {

@@ -4,10 +4,18 @@ import Search from "./Search";
 import AddContactForm from "./AddContactForm";
 import ContactList from "./ContactList";
 import contactOptions from "./services/contacts";
+import Notification from "./Notification";
 import { v4 as uuidv4 } from "uuid";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [searchText, setSearchText] = useState("");
+  const [messageAndStatus, setMessageAndStatus] = useState({
+    message: "",
+    status: "",
+  });
 
   useEffect(() => {
     // to prevent state update on unmounted component
@@ -15,12 +23,19 @@ const App = () => {
 
     contactOptions
       .getAllContacts()
-      .then((response) =>
-        isComponentMounted ? setPersons(response.data) : null
+      .then((receivedContacts) =>
+        isComponentMounted ? setPersons(receivedContacts) : null
       );
 
     return () => (isComponentMounted = false);
   }, []);
+
+  useEffect(() => {
+    let messageTimer = setTimeout(() => {
+      setMessageAndStatus({ message: "", status: "" });
+    }, 5000);
+    return () => clearTimeout(messageTimer);
+  }, [messageAndStatus]);
 
   // commented out hard coded contacts after adding axios fetched contacts
   // const [persons, setPersons] = useState([
@@ -30,9 +45,7 @@ const App = () => {
   //   { name: "Mary Poppendieck", number: "39-23-6423122" },
   // ]);
 
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const [searchText, setSearchText] = useState("");
+  // Handler Functions
 
   const handleTextInput = (event) => {
     // console.log(event.target.value);
@@ -78,17 +91,25 @@ const App = () => {
               ...person,
               number: newContactObj.number,
             })
-            .then((response) => {
+            .then((receivedContactObj) => {
               setPersons(
-                persons.map(
-                  (person) =>
-                    person.id !== existingPerson.id ? person : response.data
-                  // person.name.toLowerCase().trim() !==
-                  // newContactObj.name.toLowerCase().trim()
+                persons.map((person) =>
+                  person.id !== existingPerson.id ? person : receivedContactObj
                 )
               );
+              setMessageAndStatus({
+                message: `Contact ${existingPerson.name} updated successfully.`,
+                status: "success",
+              });
               setNewName("");
               setNewNumber("");
+            })
+            .catch((err) => {
+              console.error(err);
+              setMessageAndStatus({
+                message: `Error updating contact ${existingPerson.name}.`,
+                status: "error",
+              });
             });
         } else return null;
       }
@@ -96,11 +117,21 @@ const App = () => {
     // add contact to db.json
     contactOptions
       .addContact(newContactObj)
-      .then((response) => {
+      .then((responseContactObj) => {
         // console.log(response.data);
-        setPersons(persons.concat(response.data));
+        setPersons(persons.concat(responseContactObj));
+        setMessageAndStatus({
+          message: `Added ${newContactObj.name}!`,
+          status: "success",
+        });
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setMessageAndStatus({
+          message: `Error adding contact.`,
+          status: "error",
+        });
+      });
     // concat to avoid direct state update
     // to clear the input field after adding new contact name
     setNewName("");
@@ -123,15 +154,26 @@ const App = () => {
             name: updatedName.trim(),
             number: updatedNumber.trim(),
           })
-          .then((response) =>
+          .then((receivedContactData) => {
             setPersons(
               persons.map((person) =>
                 // person.id === contactToUpdate.id ? response.data : person
                 // same but more efficient
-                person.id !== contactToUpdate.id ? person : response.data
+                person.id !== contactToUpdate.id ? person : receivedContactData
               )
-            )
-          );
+            );
+            setMessageAndStatus({
+              message: `Contact ${receivedContactData.name} updated successfully.`,
+              status: "success",
+            });
+          })
+          .catch((err) => {
+            setMessageAndStatus({
+              message: `Error: contact ${contactToUpdate.name} already removed from server.`,
+              status: "error",
+            });
+            console.error(err);
+          });
       }
     }
   };
@@ -140,17 +182,30 @@ const App = () => {
     if (window.confirm(`Delete ${contactToDelete.name}?`)) {
       contactOptions
         .deleteContact(contactToDelete.id)
-        .then(() =>
+        .then(() => {
           setPersons(
             persons.filter((person) => person.id !== contactToDelete.id)
-          )
-        );
+          );
+          setMessageAndStatus({
+            message: `Contact ${contactToDelete.name} deleted.`,
+            status: "success",
+          });
+        })
+        .catch((err) => {
+          console.error(err);
+          setMessageAndStatus({
+            message: `Error deleting contact ${contactToDelete.name}.`,
+            status: "error",
+          });
+        });
     }
   };
 
   return (
     <div className="App">
       <h1>Phonebook</h1>
+
+      <Notification messageAndStatus={messageAndStatus} />
 
       <AddContactForm
         handleAddContact={handleAddContact}

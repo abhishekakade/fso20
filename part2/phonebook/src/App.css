@@ -60,3 +60,26 @@ button.update-btn:hover {
   color: royalblue;
   border: 2px solid royalblue;
 }
+
+.notification-toast {
+  /* position: fixed; */
+  height: 4rem;
+  border-radius: 5px;
+  padding: 1rem;
+  width: 60ch;
+  display: block;
+  margin: auto;
+}
+
+.notification-toast p {
+  margin: 0;
+}
+
+.success {
+  border: 2px solid green;
+}
+
+.error {
+  border: 2px solid crimson;
+  color: crimson;
+}
