@@ -3,7 +3,8 @@ import "./App.css";
 import Search from "./Search";
 import AddContactForm from "./AddContactForm";
 import ContactList from "./ContactList";
-import axios from "axios";
+import contactOptions from "./services/contacts";
+import { v4 as uuidv4 } from "uuid";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -12,11 +13,11 @@ const App = () => {
     // to prevent state update on unmounted component
     let isComponentMounted = true;
 
-    console.log("useEffect");
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("Promise fulfilled", response.data);
-      if (isComponentMounted) setPersons(response.data);
-    });
+    contactOptions
+      .getAllContacts()
+      .then((response) =>
+        isComponentMounted ? setPersons(response.data) : null
+      );
 
     return () => (isComponentMounted = false);
   }, []);
@@ -52,29 +53,99 @@ const App = () => {
     const newContactObj = {
       name: newName.trim(),
       number: newNumber.trim(),
-      id: persons.length + 1,
+      // json-server auto generates and sends ids in response object
+      // so this is not really necessary but I used uuid anyway
+      id: uuidv4(),
     };
     for (let person of persons) {
-      if (
-        person.name.toLowerCase().trim() === newContactObj.name.toLowerCase()
-      ) {
-        alert(
-          `Contact with the name "${newContactObj.name}" has already been added to the phonebook!`
-        );
-        return null;
-      } else if (person.number?.trim() === newContactObj.number) {
+      if (person.number?.trim() === newContactObj.number) {
         alert(`This number has already been registered in your phonebook!`);
         return null;
       } else if (newContactObj.name === "" || newContactObj.number === "") {
         alert(`Contact details cannot be empty!`);
         return null;
+      } else if (
+        person.name.toLowerCase().trim() === newContactObj.name.toLowerCase()
+      ) {
+        if (
+          window.confirm(
+            `Contact with name "${newContactObj.name}" already exists in the phonebook! Replace the old number with this new one?`
+          )
+        ) {
+          let existingPerson = person;
+          return contactOptions
+            .replaceContact(existingPerson.id, {
+              ...person,
+              number: newContactObj.number,
+            })
+            .then((response) => {
+              setPersons(
+                persons.map(
+                  (person) =>
+                    person.id !== existingPerson.id ? person : response.data
+                  // person.name.toLowerCase().trim() !==
+                  // newContactObj.name.toLowerCase().trim()
+                )
+              );
+              setNewName("");
+              setNewNumber("");
+            });
+        } else return null;
       }
     }
+    // add contact to db.json
+    contactOptions
+      .addContact(newContactObj)
+      .then((response) => {
+        // console.log(response.data);
+        setPersons(persons.concat(response.data));
+      })
+      .catch((err) => console.error(err));
     // concat to avoid direct state update
-    setPersons(persons.concat(newContactObj));
     // to clear the input field after adding new contact name
     setNewName("");
     setNewNumber("");
+  };
+
+  const handleContactUpdate = (contactToUpdate) => {
+    if (window.confirm("Update this contact?")) {
+      let updatedName =
+        prompt("Update contact name.", contactToUpdate.name) ||
+        contactToUpdate.name;
+      let updatedNumber =
+        prompt("Update contact number.", contactToUpdate.number) ||
+        contactToUpdate.number;
+      // to make sure fields are not empty
+      if (updatedName.trim() && updatedNumber.trim()) {
+        contactOptions
+          .updateContact(contactToUpdate.id, {
+            // id: person.id,
+            name: updatedName.trim(),
+            number: updatedNumber.trim(),
+          })
+          .then((response) =>
+            setPersons(
+              persons.map((person) =>
+                // person.id === contactToUpdate.id ? response.data : person
+                // same but more efficient
+                person.id !== contactToUpdate.id ? person : response.data
+              )
+            )
+          );
+      }
+    }
+  };
+
+  const handleContactDelete = (contactToDelete) => {
+    if (window.confirm(`Delete ${contactToDelete.name}?`)) {
+      contactOptions
+        .deleteContact(contactToDelete.id)
+        .then(() =>
+          setPersons(
+            persons.filter((person) => person.id !== contactToDelete.id)
+          )
+        );
+    }
   };
 
   return (
@@ -90,7 +161,12 @@ const App = () => {
       />
       <Search searchText={searchText} handleSearchText={handleSearchText} />
 
-      <ContactList searchText={searchText} persons={persons} />
+      <ContactList
+        searchText={searchText}
+        persons={persons}
+        handleContactUpdate={handleContactUpdate}
+        handleContactDelete={handleContactDelete}
+      />
     </div>
   );
 };
