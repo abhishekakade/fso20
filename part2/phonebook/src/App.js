@@ -35,15 +35,7 @@ const App = () => {
       setMessageAndStatus({ message: "", status: "" });
     }, 5000);
     return () => clearTimeout(messageTimer);
-  }, [messageAndStatus]);
-
-  // commented out hard coded contacts after adding axios fetched contacts
-  // const [persons, setPersons] = useState([
-  //   { name: "Arto Hellas", number: "040-123456" },
-  //   { name: "Ada Lovelace", number: "39-44-5323523" },
-  //   { name: "Dan Abramov", number: "12-43-234345" },
-  //   { name: "Mary Poppendieck", number: "39-23-6423122" },
-  // ]);
+  }, [messageAndStatus.status]);
 
   // Handler Functions
 
