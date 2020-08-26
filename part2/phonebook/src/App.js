@@ -141,7 +141,7 @@ const App = () => {
       // to make sure fields are not empty
       if (updatedName.trim() && updatedNumber.trim()) {
         contactOptions
-          .replaceContact(contactToUpdate.id, {
+          .updateContact(contactToUpdate.id, {
             // id: person.id,
             name: updatedName.trim(),
             number: updatedNumber.trim(),
