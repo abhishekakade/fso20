@@ -6,6 +6,7 @@ const baseURL = "/api/persons";
 const getAllContacts = async () => {
   const request = axios.get(baseURL);
   const response = await request;
+  // console.log(response.data);
   return response.data;
 };
 
